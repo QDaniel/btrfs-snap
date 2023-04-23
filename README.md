@@ -50,6 +50,20 @@ The above cronjob would
 1. create a snapshot of / every 5 minutes, keeping 12 generations in /.snapshot
 1. create a snapshot of /home every day, keeping 7 generations in /snapshots/home
 
+btrfs-cronsnap
+==========
+
+btrfs-cronsnap creates and maintains btrfs snapshots with cron.
+
+Usage
+-----
+
+1. Copy btrfs-snap to /usr/local/sbin/
+2. Copy or Link the btrfsp-cronsnap script to /etc/cron.hourly, /etc/cron.daily, /etc/cron.weekly, or/and /etc/cron.monthly
+
+Others
+======
+
 OS Support
 ----------
 
