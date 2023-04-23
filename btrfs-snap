@@ -126,7 +126,7 @@ while getopts "hVrqpEb:d:B:ct:T:" arg; do
         q )
             quiet="1"
             ;;
-        p ) 
+        p )
             use_as_prefix=false
             ;;
         E )
@@ -175,14 +175,17 @@ if [ $# -ne 3 ] ; then
     exit 1
 fi
 
-# Remove trailing slash
-mp=${1%/}
+# Canonicalize the mountpoint path (strip trailing slashes, etc)
+mp=$(realpath -m $1)
 prefix=$2
 cnt=$(( $3+1 ))
 
 function log.info() {
     logger -p ${LOG_FACILITY}.info -t ${prog} "$1"
-    test -z "$quiet" && echo "$1"
+    if test -z "$quiet"
+    then
+        echo "$1"
+    fi
 }
 
 function log.error() {
@@ -192,10 +195,9 @@ function log.error() {
 }
 
 # Verify that the path is either a valid btrfs mountpoint
-mount -t btrfs | cut -d " " -f 3 | grep "^${mp}$" > /dev/null
-if [ $? -ne 0 ] ; then
+if ! findmnt -t btrfs -T "${mp}" &> /dev/null; then
     # or a valid snapshot matching mp
-    btrfs subvolume show $mp | grep "${mp}$" > /dev/null
+    btrfs subvolume show $mp > /dev/null
     if [ $? -ne 0 ] ; then
         log.error "${mp} is not a btrfs mountpoint (or old version of btrfs-tools, try > 0.19)"
         exit 1;
@@ -287,4 +289,3 @@ ls -dr $base/${snappattern} | tail -n +${cnt} | while read snap ; do
         log.error "${out}"
     fi
 done
-
