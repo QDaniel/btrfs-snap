@@ -1,0 +1,23 @@
+#! /bin/bash
+
+SCHEDULE=`echo $0|cut -f 2 -d'.'|cut -f 1 -d'/'|egrep "^hourly$|^daily$|^weekly$|^monthly$"`
+if [ ${#SCHEDULE} == 0 ] ;
+then
+SCHEDULE=`pwd|cut -f 2 -d'.'|egrep "^hourly$|^daily$|^weekly$|^monthly$"`
+fi
+if [ $SCHEDULE = 'hourly' ] ;
+then
+SAVECOUNT=24
+elif [ $SCHEDULE = 'daily' ] ;
+then
+SAVECOUNT=30
+elif [ $SCHEDULE = 'weekly' ] ;
+then
+SAVECOUNT=6
+elif [ $SCHEDULE = 'monthly' ] ;
+then
+SAVECOUNT=12
+else
+exit 0;
+fi
+cat /proc/mounts|grep btrfs|tr -s ' '|cut -f 2 -d ' '|xargs -i /usr/local/sbin/btrfs-snap {} $SCHEDULE $SAVECOUNT
